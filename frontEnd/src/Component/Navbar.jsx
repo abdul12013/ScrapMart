@@ -4,6 +4,7 @@ import { asset} from '../assets/assest'
 import { motion, AnimatePresence } from 'framer-motion'
 const Navbar = () => {
   const [show,setShow]=useState(false)
+  const {backendUrl,navigate,token,setToken, setUserRole}=useContext(ScrapContext)
   return (
     <div className=''>
        <div className=' z-20 font-poppins  px-4  h-16 w-full max-w-screen  flex  items-center justify-between  font-medium bg-transparent text-gray-500'>
