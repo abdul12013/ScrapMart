@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useContext  } from 'react'
 import { NavLink } from 'react-router-dom'
 import { asset} from '../assets/assest'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -28,7 +28,7 @@ const Navbar = () => {
               </NavLink>
         </div>
         <div>
-            <button className=' ml-2  h-9 w-24 border border-green-400 shadow-emerald-300 rounded-lg shadow-sm'>Sign</button>
+            <button onClick=(()=>{navigate('/Registor')}) className=' ml-2  h-9 w-24 border border-green-400 shadow-emerald-300 rounded-lg shadow-sm'>Sign</button>
         </div>
 
         <div className=' z-40 relative sm:hidden' onClick={()=>{setShow(!show)}}>
