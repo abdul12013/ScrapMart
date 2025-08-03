@@ -12,7 +12,7 @@ import cors from 'cors'
 import { ConnectDB } from './config/mongoDB.js'
 import { Registor ,otpVerification} from './controller/userController.js'
 import scrapRouter from './routes/scrapRoute.js'
-import { disconnect } from 'process'
+
 import { ioInstance } from './controller/scrapController.js'
 
 
