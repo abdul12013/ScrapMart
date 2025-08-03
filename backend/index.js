@@ -45,7 +45,7 @@ ConnectDB()
 // creating the connection 
 
 console.log(process.env.MONGO_URL)
-server.get('/',(req,res)=>{
+app.get('/',(req,res)=>{
     res.json('landing page is here ')
 })
 
