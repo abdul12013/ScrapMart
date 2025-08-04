@@ -8,158 +8,95 @@ import { socket } from '../socket';
 
 const AllScrap = () => {
   const [show, setShow] = useState(null);
-  const [status ,setStatus]=useState('Pending')
+  const [status, setStatus] = useState('Pending');
   const [scrap, setSCrap] = useState([]);
   const [shopName, setShopName] = useState('');
   const [bit, setBit] = useState(0);
-  const [exloding,setExloding]=useState(false)
-  const[location,setLocation]=useState({lat:null,lng:null})
-  // const [allbit,setAllBit]=useState([])
-  const [allbit, setAllBit] = useState([])
-  
-  const { token, backendUrl, userRole ,user, navigate} = useContext(ScrapContext);
+  const [exloding, setExloding] = useState(false);
+  const [location, setLocation] = useState({ lat: null, lng: null });
+  const [allbit, setAllBit] = useState([]);
 
+  const { token, backendUrl, userRole, user, navigate } = useContext(ScrapContext);
 
-
-  useEffect(()=>{
-    if(token === ''){
-      navigate('/Registor')
+  useEffect(() => {
+    if (token === '') {
+      navigate('/Registor');
     }
-  },[])
-  
-
-  
+  }, []);
 
   useEffect(() => {
     const handleNewBit = (setBit) => {
-      // setAllBit((prev) => {
-      //   const existingIds = new Set(prev.map((bit) => bit._id));
-      //   const newBits = setBit.filter((b) => !existingIds.has(b._id));
-      //   return [...prev, ...newBits];
-      // });
+      setAllBit(setBit);
+      console.log(allbit.length === 0);
+    };
 
-      setAllBit(setBit)
-      
-      console.log(allbit.length ===0)
-      
-    }
-    
+    socket.emit('get-status', { token });
 
-    socket.emit('get-status',{
-      token
-    })
+    socket.on('set-status', ({ status }) => setStatus(status));
+    socket.on('send-bit', handleNewBit);
 
-    socket.on('set-status',({status})=>{
-      setStatus(status)
-    })
-  
-    socket.on('send-bit', handleNewBit)
-
-    socket.on('bit-success',({setBit})=>{
-      setAllBit(setBit)
-      toast.success('cmfvofmoi');
+    socket.on('bit-success', ({ setBit }) => {
+      setAllBit(setBit);
+      toast.success('Bid submitted successfully');
       setTimeout(() => {
-        window.location.reload(); // 🔁 page will now reload correctly
+        window.location.reload();
       }, 1000);
-      
-    })
-   
-    socket.on('error-bit',({msg})=>{
-      toast.error(msg);
-    })
-    socket.on('bit-reject',(notRejectBit)=>{
-      setAllBit(notRejectBit)
-      console.log(allbit.length)
-      toast.success('rejected success')
-    })
-    socket.on('bit-deleted', ({id})=>{
-    
-    setSCrap(prev => prev.filter(item => item._id !== id));
-    setExloding(true)
-    }); 
-  
+    });
+
+    socket.on('error-bit', ({ msg }) => toast.error(msg));
+
+    socket.on('bit-reject', (notRejectBit) => {
+      setAllBit(notRejectBit);
+      toast.success('Rejected successfully');
+    });
+
+    socket.on('bit-deleted', ({ id }) => {
+      setSCrap((prev) => prev.filter((item) => item._id !== id));
+      setExloding(true);
+    });
+
     return () => {
-      socket.off('send-bit', handleNewBit)
-      // socket.off('bit-deleted', handleDeleteBit); 
+      socket.off('send-bit', handleNewBit);
       socket.off('bit-success');
-    socket.off('error-bit');
-    socket.off('bit-reject')
-    socket.off('bit-deleted')
-    }
-  }, [allbit,status,scrap])
-  
+      socket.off('error-bit');
+      socket.off('bit-reject');
+      socket.off('bit-deleted');
+    };
+  }, [allbit, status, scrap]);
 
   const bitSubmit = async (e, scrapId) => {
-    try {
-      e.preventDefault();
-      socket.emit('sub-bit',{
-        token,
-        scrapId,
-        shopName,
-        bit
+    e.preventDefault();
+    socket.emit('sub-bit', {
+      token,
+      scrapId,
+      shopName,
+      bit,
+    });
+  };
 
-      })
-   
-      
-     
-     
-    } catch (e) {
-      toast.error(e.message);
+  const handleShow = async (scrapId) => {
+    try {
+      const toggle = show === scrapId ? null : scrapId;
+      setShow(toggle);
+      socket.emit('sendId', { scrapId });
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
-
-  
-
-  
-  const handleShow=async (scrapId)=>{
-    try{
-    const toggle=show === scrapId ? null : scrapId
-      setShow(toggle)
-
-      socket.emit('sendId',{
-        scrapId
-      })
-    // if(toggle !==null){
-    //   console.log(scrapId)
-    //   const response=await axios.get(`${backendUrl}/scrap/allbit/${scrapId}`,{
-    //     headers:{token}
-    //   })
-    //   console.log(response.data)
-    // }}
-    }
-    catch(err){
-      toast.error(err.message)
-    }
-  }
   useEffect(() => {
-   
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-      
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
-          setLocation(coords)
-  
-      }
-    )
-   console.log(userRole)
-    const fetchSCrap = async () => {
+    const fetchScrap = async (lat, lng) => {
       try {
         const endpoint =
           userRole === 'dealer'
-            ? `${backendUrl}/scrap/allscrap?lat=${location.lat}&lng=${location.lng}`
+            ? `${backendUrl}/scrap/allscrap?lat=${lat}&lng=${lng}`
             : `${backendUrl}/scrap/userscrap`;
 
         const response = await axios.get(endpoint, {
           headers: { token },
         });
-        // console.log(response.data)
 
         if (response.data.success === true) {
-          // console.log(location)
           setSCrap(response.data.scrap);
         }
       } catch (e) {
@@ -167,36 +104,33 @@ const AllScrap = () => {
       }
     };
 
-    fetchSCrap();
-  }, [userRole, backendUrl, token,location]);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+          setLocation(coords);
+          fetchScrap(coords.lat, coords.lng); // ✅ Fetch only after location
+        },
+        (err) => {
+          toast.error("Location permission denied. Please enable it.");
+        }
+      );
+    } else {
+      toast.error("Geolocation not supported.");
+    }
+  }, [userRole, backendUrl, token]);
 
+  const Reject = (lat, lng, bitid) => {
+    socket.emit('send-reject-request', { lat, lng, bitId: bitid });
+  };
 
-  
-  //acept and reject with socket 
-
-  const Reject=(lat,lng,bitid)=>{
-
-    socket.emit('send-reject-request',{
-      lat,
-      lng,
-      bitId:bitid
-    })
-  }
-
-  const Accept=async(lat,lng,bitid)=>{
-
-   
-      setExloding(true)
-   
-    socket.emit('send-accept-request',{
-      lat,
-      lng,
-      bitId:bitid
-    })
-  }
-
-
-
+  const Accept = async (lat, lng, bitid) => {
+    setExloding(true);
+    socket.emit('send-accept-request', { lat, lng, bitId: bitid });
+  };
 
   return (
     <div className="pb-32 bg-gradient-to-b from-slate-100 to-slate-300 flex flex-col items-center min-h-screen relative">
@@ -229,59 +163,41 @@ const AllScrap = () => {
                 </p>
                 <p className="text-sm text-gray-600 font-poppins">{scrapItem.des}</p>
 
-                {
-                userRole ==='coustomer'?(
+                {userRole === 'coustomer' ? (
                   <motion.button
-                    onClick={() =>
-                      handleShow(scrapItem._id)
-                    }
-                    whileHover={{
-                      scale: 1.05,
-                      backgroundColor: '#f97316',
-                      boxShadow: '0 10px 20px rgba(249, 115, 22, 0.3)',
-                    }}
+                    onClick={() => handleShow(scrapItem._id)}
+                    whileHover={{ scale: 1.05, backgroundColor: '#f97316', boxShadow: '0 10px 20px rgba(249, 115, 22, 0.3)' }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 200 }}
                     className="mt-6 w-full h-11 bg-orange-500 rounded-xl font-poppins text-white text-md shadow-md transition-all duration-300"
                   >
                     {show === scrapItem._id ? 'Hide Bid' : 'Show Bid'}
                   </motion.button>
-                ):(
-               (scrapItem.bit.length > 0 && scrapItem.bit.some(b => b.user === user._id)) ? (
-                (() => {
-                  const userBit = scrapItem.bit.find(b => b.user === user._id);
-                  return (
-                    <p className={`mt-2 text-xl font-poppins font-bold ${userBit.bitStatus === 'Reject' ? 'text-red-600' : 'text-gray-500'}`}>
-                      {userBit.bitStatus}
-                    </p>
-                  );
-                })()
-              ) : (
+                ) : scrapItem.bit.length > 0 && scrapItem.bit.some((b) => b.user === user._id) ? (
+                  (() => {
+                    const userBit = scrapItem.bit.find((b) => b.user === user._id);
+                    return (
+                      <p className={`mt-2 text-xl font-poppins font-bold ${userBit.bitStatus === 'Reject' ? 'text-red-600' : 'text-gray-500'}`}>
+                        {userBit.bitStatus}
+                      </p>
+                    );
+                  })()
+                ) : (
                   <motion.button
-                    onClick={() =>
-                      handleShow(scrapItem._id)
-                    }
-                    whileHover={{
-                      scale: 1.05,
-                      backgroundColor: '#f97316',
-                      boxShadow: '0 10px 20px rgba(249, 115, 22, 0.3)',
-                    }}
+                    onClick={() => handleShow(scrapItem._id)}
+                    whileHover={{ scale: 1.05, backgroundColor: '#f97316', boxShadow: '0 10px 20px rgba(249, 115, 22, 0.3)' }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 200 }}
                     className="mt-6 w-full h-11 bg-orange-500 rounded-xl font-poppins text-white text-md shadow-md transition-all duration-300"
                   >
                     {show === scrapItem._id ? 'Hide Bid' : 'Show Bid'}
                   </motion.button>
-                )
                 )}
 
-                {/* Bid Form or Display */}
+                {/* Bid Form */}
                 {userRole === 'dealer' ? (
-                  (show === scrapItem._id && scrapItem.bit.length===0) && (
-                    <form
-                      onSubmit={(e) => bitSubmit(e, scrapItem._id)}
-                      className="ml-10"
-                    >
+                  show === scrapItem._id && scrapItem.bit.length === 0 && (
+                    <form onSubmit={(e) => bitSubmit(e, scrapItem._id)} className="ml-10">
                       <input
                         required
                         onChange={(e) => setShopName(e.target.value)}
@@ -303,57 +219,44 @@ const AllScrap = () => {
                       </button>
                     </form>
                   )
-                ) : scrapItem.bit.length > 0 && scrapItem.bit.bitStatus!=='Reject' && show === scrapItem._id ? (
-
-                  <motion.div
-                 
-
-                  
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="mt-5 space-y-3"
-                  >
-                     {allbit.length>0 &&( 
-                     allbit
-  .filter((bit) => bit.bitStatus !== 'Reject') // 🔍 Filter out rejected bids
-  .map((bit) => (
-    <React.Fragment key={bit._id}>
-      <p className="font-poppins text-gray-800">
-        Shop Name:{' '}
-        <span className="font-bold text-pink-500">{bit.shopName}</span>
-      </p>
-      <p className="font-poppins text-gray-800">
-        Bid Price:{' '}
-        <span className="font-bold text-green-600">₹{bit.bitAmount}</span>
-      </p>
-
-      <div className="flex gap-4 mt-3">
-        <motion.button
-          onClick={() =>
-            Accept(scrapItem.location.coordinates[0], scrapItem.location.coordinates[1], bit._id)
-          }
-          whileTap={{ scale: 0.95 }}
-          className="flex-1 h-9 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold shadow-md transition-all"
-        >
-          {exloding ===true?'Loading.....':'Accept'}
-        </motion.button>
-        <motion.button
-          onClick={() =>
-            Reject(scrapItem.location.coordinates[0], scrapItem.location.coordinates[1], bit._id)
-          }
-          whileTap={{ scale: 0.95 }}
-          className="flex-1 h-9 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold shadow-md transition-all"
-        >
-          Reject
-        </motion.button>
-      </div>
-    </React.Fragment>
-  )))}
-
+                ) : scrapItem.bit.length > 0 && scrapItem.bit.bitStatus !== 'Reject' && show === scrapItem._id ? (
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mt-5 space-y-3">
+                    {allbit.length > 0 &&
+                      allbit
+                        .filter((bit) => bit.bitStatus !== 'Reject')
+                        .map((bit) => (
+                          <React.Fragment key={bit._id}>
+                            <p className="font-poppins text-gray-800">
+                              Shop Name: <span className="font-bold text-pink-500">{bit.shopName}</span>
+                            </p>
+                            <p className="font-poppins text-gray-800">
+                              Bid Price: <span className="font-bold text-green-600">₹{bit.bitAmount}</span>
+                            </p>
+                            <div className="flex gap-4 mt-3">
+                              <motion.button
+                                onClick={() =>
+                                  Accept(scrapItem.location.coordinates[0], scrapItem.location.coordinates[1], bit._id)
+                                }
+                                whileTap={{ scale: 0.95 }}
+                                className="flex-1 h-9 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold shadow-md transition-all"
+                              >
+                                {exloding ? 'Loading.....' : 'Accept'}
+                              </motion.button>
+                              <motion.button
+                                onClick={() =>
+                                  Reject(scrapItem.location.coordinates[0], scrapItem.location.coordinates[1], bit._id)
+                                }
+                                whileTap={{ scale: 0.95 }}
+                                className="flex-1 h-9 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold shadow-md transition-all"
+                              >
+                                Reject
+                              </motion.button>
+                            </div>
+                          </React.Fragment>
+                        ))}
                   </motion.div>
                 ) : (
-                  ( allbit.length ===0) && (
+                  allbit.length === 0 && (
                     <p className="mt-4 text-sm font-poppins text-gray-500 italic">
                       No bids available for this scrap item.
                     </p>
