@@ -13,6 +13,7 @@ const AllScrap = () => {
   const [shopName, setShopName] = useState('');
   const [bit, setBit] = useState(0);
   const [exloding,setExloding]=useState(false)
+  const[location,setLocation]=useState({lat:null,lng:null})
   // const [allbit,setAllBit]=useState([])
   const [allbit, setAllBit] = useState([])
   
@@ -132,20 +133,33 @@ const AllScrap = () => {
     }
   }
   useEffect(() => {
+   
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+      
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+          setLocation(coords)
+  
+      }
+    )
    console.log(userRole)
     const fetchSCrap = async () => {
       try {
         const endpoint =
           userRole === 'dealer'
-            ? `${backendUrl}/scrap/allscrap`
+            ? `${backendUrl}/scrap/allscrap?lat=${location.lat}&lng=${location.lng}`
             : `${backendUrl}/scrap/userscrap`;
 
         const response = await axios.get(endpoint, {
           headers: { token },
         });
-        console.log(response.data)
+        // console.log(response.data)
 
         if (response.data.success === true) {
+          // console.log(location)
           setSCrap(response.data.scrap);
         }
       } catch (e) {
@@ -154,7 +168,7 @@ const AllScrap = () => {
     };
 
     fetchSCrap();
-  }, [userRole, backendUrl, token]);
+  }, [userRole, backendUrl, token,location]);
 
 
   
@@ -300,7 +314,8 @@ const AllScrap = () => {
                     transition={{ duration: 0.4 }}
                     className="mt-5 space-y-3"
                   >
-                     {allbit
+                     {allbit.length>0 &&( 
+                     allbit
   .filter((bit) => bit.bitStatus !== 'Reject') // 🔍 Filter out rejected bids
   .map((bit) => (
     <React.Fragment key={bit._id}>
@@ -334,7 +349,7 @@ const AllScrap = () => {
         </motion.button>
       </div>
     </React.Fragment>
-  ))}
+  )))}
 
                   </motion.div>
                 ) : (
