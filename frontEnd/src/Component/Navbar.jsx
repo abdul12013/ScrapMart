@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { asset} from '../assets/assest'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useContext, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { asset } from '../assets/assest';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ScrapContext } from '../Context/ScrapContext';
+
 const Navbar = () => {
-  const [show,setShow]=useState(false)
+  const [show, setShow] = useState(false);
+  const { navigate } = useContext(ScrapContext);
+
   return (
     <div className="relative z-50">
       {/* Top Navbar */}
@@ -17,8 +21,28 @@ const Navbar = () => {
           <NavLink to="/help"><p>Help</p></NavLink>
           <NavLink to="/postscrap"><p>PostScrap</p></NavLink>
         </div>
-        <div>
-            <button className=' ml-2  h-9 w-24 border border-green-400 shadow-emerald-300 rounded-lg shadow-sm'>Sign</button>
+
+        {/* Sign Button */}
+        <button
+          onClick={() => {
+            console.log('hii');
+            navigate('/Registor'); // if you're using context-based navigate
+          }}
+          className="ml-2 h-10 w-28 rounded-xl border border-green-500 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg transition-all duration-300 ease-in-out"
+        >
+          Sign
+        </button>
+
+        {/* Burger Icon for Mobile */}
+        <div
+          className="z-50 relative sm:hidden cursor-pointer"
+          onClick={() => setShow(!show)}
+        >
+          <img
+            src={show ? asset.cross_icon : asset.menu_icon}
+            className="w-6"
+            alt="menu"
+          />
         </div>
       </div>
 
@@ -51,4 +75,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar
+export default Navbar;
