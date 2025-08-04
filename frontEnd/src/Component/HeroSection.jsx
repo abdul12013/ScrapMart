@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { asset } from '../assets/assest'
 import Navbar from './Navbar'
 import { motion } from 'framer-motion'
+import { ScrapContext } from '../Context/ScrapContext'
 const HeroSection = () => {
-    
+    const {navigate}=useContext(ScrapContext)
   return (
     <div className="relative w-full h-screen overflow-hidden">
     {/* Background Video */}
@@ -36,7 +37,10 @@ const HeroSection = () => {
       <p className="mt-4 text-lg md:text-2xl max-w-xl">
       Instant doorstep scrap pickup & best price guarantee. Join the recycling revolution with ScrapMart.
       </p>
-      <button className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-semibold transition">
+      <button onClick={() => {
+            console.log('hii');
+            navigate('/Registor'); // if you're using context-based navigate
+          }} className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-semibold transition">
         Get Started
       </button>
     </motion.div>
