@@ -39,7 +39,7 @@ export const  Registor =async(req,res)=>{
     from:process.env.EMAIL,
     to:email,
     subject:"Email verification ",
-    html:`<h3>your verification link is  </h3> <a href="https://scrap-mart-p8qa.vercel.app/verified?token=${token}">verify </a>`
+    html:`<h3>your verification link is  </h3> <a href="https://scrap-mart-mgmu.vercel.app/verified?token=${token}">verify </a>`
    }
    await trans.sendMail(mailoption)
    res.json({success:true,msg:'Please check your Email for verification Link  '})
