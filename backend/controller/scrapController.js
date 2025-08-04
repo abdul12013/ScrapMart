@@ -57,7 +57,7 @@ export const allSCrap=async(req,res)=>{
             $near:{
              $geometry:{
                 type:"Point",
-                coordinates:[parseFloat(lng),parseFloat(lat)]
+                coordinates:[parseFloat(lat),parseFloat(lng)]
              }   ,
              $maxDistance:1000
         }}})
