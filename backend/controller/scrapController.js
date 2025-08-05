@@ -61,7 +61,7 @@ export const allSCrap=async(req,res)=>{
              }   ,
              $maxDistance:1000
         }}}).populate('bit')
-        // console.log(scrap)
+        console.log(scrap)
         return res.json({success:true,scrap})
     }
     catch(e){
