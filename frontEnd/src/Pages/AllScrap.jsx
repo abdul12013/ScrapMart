@@ -166,7 +166,7 @@ useEffect(()=>{
         // console.log(response.data)
 
         if (response.data.success === true) {
-          console.log(location)
+          // console.log(location)
           setSCrap(response.data.scrap);
         }
       } catch (e) {
