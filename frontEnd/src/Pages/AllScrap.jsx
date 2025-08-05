@@ -146,7 +146,7 @@ const AllScrap = () => {
     }
   }
   useEffect(() => {
-   
+    if (!location.lat || !location.lng) return; 
    
    console.log(userRole)
     const fetchSCrap = async () => {
@@ -171,7 +171,7 @@ const AllScrap = () => {
     };
 
     fetchSCrap();
-  }, [userRole, backendUrl, token,location]);
+  }, [location.lat,location.lng,userRole, backendUrl, token]);
 
 
   
