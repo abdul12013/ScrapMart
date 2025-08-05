@@ -175,7 +175,7 @@ useEffect(()=>{
     };
 
     fetchSCrap();
-  }, [userRole, backendUrl, token,location]);
+  }, [userRole, backendUrl, token]);
 
 
   
