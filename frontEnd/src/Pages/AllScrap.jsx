@@ -19,7 +19,7 @@ const AllScrap = () => {
   
   const { token, backendUrl, userRole ,user, navigate} = useContext(ScrapContext);
 
-useEffect(()=>{
+  useEffect(()=>{
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
       
@@ -31,7 +31,8 @@ useEffect(()=>{
   
       }
     )
-},[])
+  },[location])
+
 
   useEffect(()=>{
     if(token === ''){
@@ -146,17 +147,7 @@ useEffect(()=>{
   }
   useEffect(() => {
    
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-      
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
-          setLocation(coords)
-  
-      }
-    )
+   
    console.log(userRole)
     const fetchSCrap = async () => {
       try {
@@ -180,7 +171,7 @@ useEffect(()=>{
     };
 
     fetchSCrap();
-  }, [userRole, backendUrl, token]);
+  }, [userRole, backendUrl, token,location]);
 
 
   
