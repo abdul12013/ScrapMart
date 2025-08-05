@@ -145,6 +145,7 @@ const AllScrap = () => {
   
       }
     )
+    if(!location.lat || !location.lng)return
    console.log(userRole)
     const fetchSCrap = async () => {
       try {
