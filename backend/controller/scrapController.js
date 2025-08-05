@@ -57,10 +57,10 @@ export const allSCrap=async(req,res)=>{
             $near:{
              $geometry:{
                 type:"Point",
-                coordinates:[parseFloat(lat),parseFloat(lng)]
+                coordinates:[parseFloat(lng),parseFloat(lat)]
              }   ,
              $maxDistance:1000
-        }}})
+        }}}).populate('bit')
         // console.log(scrap)
         return res.json({success:true,scrap})
     }
