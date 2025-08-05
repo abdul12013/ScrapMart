@@ -26,21 +26,6 @@ const AllScrap = () => {
       navigate('/Registor')
     }
   },[])
-
-
-useEffect(()=>{
-   navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-      
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
-          setLocation(coords)
-  
-      }
-    )
-},[location])
   
 
   
@@ -147,11 +132,19 @@ useEffect(()=>{
       toast.error(err.message)
     }
   }
-
-  
   useEffect(() => {
    
-   
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+      
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+          setLocation(coords)
+  
+      }
+    )
    console.log(userRole)
     const fetchSCrap = async () => {
       try {
@@ -163,7 +156,7 @@ useEffect(()=>{
         const response = await axios.get(endpoint, {
           headers: { token },
         });
-        // console.log(response.data)
+        console.log(response.data)
 
         if (response.data.success === true) {
           // console.log(location)
@@ -175,7 +168,7 @@ useEffect(()=>{
     };
 
     fetchSCrap();
-  }, [userRole, backendUrl, token]);
+  }, [userRole, backendUrl, token,location]);
 
 
   
