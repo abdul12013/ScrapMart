@@ -50,18 +50,18 @@ export const allSCrap=async(req,res)=>{
     try{
         const {lat,lng}=req.query
         const distance=10*1000
-        console.log(lat)
-        console.log(lng)
+        // console.log(lat)
+        // console.log(lng)
         // const scrap=await scrapModel.find().populate('bit')
-        const scrap=await scrapModel.find({location:{
-            $near:{
-             $geometry:{
-                type:"Point",
-                coordinates:[parseFloat(lng),parseFloat(lat)]
-             }   ,
-             $maxDistance:1000
-        }}})
-        console.log(scrap)
+        // const scrap=await scrapModel.find({location:{
+        //     $near:{
+        //      $geometry:{
+        //         type:"Point",
+        //         coordinates:[parseFloat(lng),parseFloat(lat)]
+        //      }   ,
+        //      $maxDistance:1000
+        // }}})
+        // console.log(scrap)
         return res.json({success:true,scrap})
     }
     catch(e){
